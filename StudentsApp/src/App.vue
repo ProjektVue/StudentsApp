@@ -1,20 +1,20 @@
 <template>
   <div id="app">
     <div>
-<!--      <top-header></top-header>-->
+      <top-header></top-header>
       <router-view/>
     </div>
   </div>
 </template>
 
 <script>
-  // import Header from "./components/Top-Header";
+  import Header from "./components/Top-Header";
 
-  export default {}
-    // components: {
-    //   "top-header": Header
-    // },
-  // }
+  export default {
+    components: {
+      "top-header": Header
+    }
+  }
 </script>
 
 <style>
