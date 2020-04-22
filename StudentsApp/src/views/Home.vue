@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    Home Page
+    <h1>Home Page</h1>
   </div>
 </template>
 
@@ -10,7 +10,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   div {
     color: inherit;
   }

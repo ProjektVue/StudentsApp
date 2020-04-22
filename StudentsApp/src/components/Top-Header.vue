@@ -1,18 +1,29 @@
 <template>
   <div>
     <nav class="navbar navbar-expand navbar-dark bg-dark">
-      <a href class="navbar-brand" @click="StudentsApp"/>
-      <div v-if="loggedIn" class="navbar-nav ml-auto">
+      <a href class="navbar-brand" @click.prevent="toHome">StudentsApp</a>
+      <div v-if="!currentUser" class="navbar-nav ml-auto">
         <li class="nav-item">
-          Wyloguj
+          <router-link to="/register" class="nav-link">
+            Rejestracja
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/login" class="nav-link">
+            Logowanie
+          </router-link>
         </li>
       </div>
-      <div v-else class="navbar-nav ml-auto">
+      <div v-if="currentUser" class="navbar-nav ml-auto">
         <li class="nav-item">
-          Zaloguj
+          <router-link to="/profile" class="nav-link">
+            {{ currentUser.email }}
+          </router-link>
         </li>
         <li class="nav-item">
-          Zarejestruje
+          <a href class="nav-link" @click.prevent="singOut">
+            Wyloguj
+          </a>
         </li>
       </div>
     </nav>
@@ -20,46 +31,40 @@
 </template>
 
 <script>
+  import {auth} from "../firebase";
+
   export default {
+    mounted() {
+      this.setUp();
+    },
+    methods: {
+      setUp() {
+        auth.onAuthStateChanged(user => {
+          console.log(user);
+          this.currentUser = user;
+        })
+      },
+      singOut() {
+        const data = auth.signOut()
+          .then(() => {
+            console.log(data);
+            this.$router.replace({name: "login"});
+          })
+          .catch(e => console.log(e));
+      },
+      toHome() {
+        this.$router.replace({name: "home"});
+      }
+    },
     data() {
       return {
-        loggedIn: false
+        loggedIn: false,
+        currentUser: null
       }
     }
   }
 </script>
 
 <style scoped>
-  label {
-    display: block;
-    margin-top: 10px;
-  }
 
-  .card-container.card {
-    max-width: 350px !important;
-    padding: 40px 40px;
-  }
-
-  .card {
-    background-color: #f7f7f7;
-    padding: 20px 25px 30px;
-    margin: 0 auto 25px;
-    margin-top: 50px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-  }
-
-  .profile-img-card {
-    width: 96px;
-    height: 96px;
-    margin: 0 auto 10px;
-    display: block;
-    -moz-border-radius: 50%;
-    -webkit-border-radius: 50%;
-    border-radius: 50%;
-  }
 </style>

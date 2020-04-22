@@ -3,10 +3,10 @@ import App from "./App";
 import router from './router';
 import store from "./store";
 import {auth} from "./firebase";
-Vue.config.productionTip = false;
-import router from './router'
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+Vue.config.productionTip = false;
 
 let app;
 auth.onAuthStateChanged(user => {
