@@ -1,14 +1,15 @@
 <template>
   <div>
-    <div v-if="error" class="error">{{error.message}}</div>
+    <h1>Login</h1>
+    <div class="error" v-if="error">{{error.message}}</div>
     <form @submit.prevent="pressed">
-      <div class="email">
-        <input type="email" v-model="email" placeholder="email"/>
+      <div class="login">
+        <input type="email" v-model="email" placeholder="login">
       </div>
       <div class="password">
-        <input type="password" v-model="password" placeholder="hasło"/>
+        <input type="password" v-model="password" placeholder="hasło">
       </div>
-      <button type="submit">Rejestracja</button>
+      <button>Zaloguj</button>
     </form>
   </div>
 </template>
@@ -26,10 +27,10 @@
     },
     methods: {
       pressed() {
-        auth.createUserWithEmailAndPassword(this.email, this.password)
-          .then(() => {
-            console.log(user);
-            this.$router.replace({name: "home"});
+        auth.signInWithEmailAndPassword(this.email, this.password)
+          .then(data => {
+            console.log(data);
+            this.$router.replace({name: "home"})
           })
           .catch(e => {
             this.error = e;
@@ -39,10 +40,9 @@
   }
 </script>
 
-<style>
-  .error {
-    color: red;
-    font-size: 18px;
+<style scoped>
+  div {
+    color: inherit;
   }
 
   input {
@@ -58,4 +58,7 @@
     font-size: 100%;
   }
 
+  .error {
+    color: red;
+  }
 </style>
