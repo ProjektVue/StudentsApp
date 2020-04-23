@@ -3,6 +3,9 @@ import App from "./App";
 import router from './router';
 import store from "./store";
 import {auth} from "./firebase";
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 Vue.config.productionTip = false;
 
 let app;

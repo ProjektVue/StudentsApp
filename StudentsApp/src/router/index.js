@@ -10,7 +10,7 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: "/register",
     name: "register",
     component: Register
   },
@@ -20,7 +20,7 @@ const routes = [
     component: Login
   },
   {
-    path: "/home",
+    path: "/",
     name: "home",
     component: Home,
     meta: {requestAuth: true}
@@ -38,7 +38,7 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = auth.currentUser;
   console.log("isAuthenticated", isAuthenticated);
   if (requiresAuth && !isAuthenticated) {
-    next("/home");
+    next("/register");
   } else {
     next();
   }
