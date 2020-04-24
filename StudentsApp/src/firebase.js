@@ -10,4 +10,19 @@ const firebaseConf = initializeApp({
   appId: "1:786385791981:web:15c8ff341bdf369f59d5e4"
 })
 
-export const auth = firebaseConf.auth()
+const auth = firebaseConf.auth()
+const db = firebaseConf.firestore()
+
+const eventsCollection = db.collection('events')
+const friendsCollection = db.collection('friends')
+
+const settings = {
+  timestampsInSnapshots: true
+}
+db.settings(settings)
+
+export {
+  auth,
+  eventsCollection,
+  friendsCollection
+}

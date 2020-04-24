@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Home from "../views/Home";
 import Login from "../views/Login";
 import Register from "../views/Register";
+import EventForm from "../views/EventForm";
 
 import {auth} from "../firebase";
 
@@ -23,6 +24,12 @@ const routes = [
     path: "/",
     name: "home",
     component: Home,
+    meta: {requestAuth: true}
+  },
+  {
+    path: "/addEvent",
+    name: "eventForm",
+    component: EventForm,
     meta: {requestAuth: true}
   }
 ]

@@ -28,9 +28,9 @@
             name="password"
             placeholder="hasło"
           />
-          <div class="form-group">
-            <button class="btn btn-primary btn-block">Rejestracja</button>
-          </div>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary btn-block">Rejestracja</button>
         </div>
       </form>
     </div>

@@ -2,6 +2,16 @@
   <div>
     <nav class="navbar navbar-expand navbar-dark bg-dark">
       <a href class="navbar-brand" @click.prevent="toHome">StudentsApp</a>
+      <div v-if="currentUser" class="navbar-nav ml-auto">
+        <div class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <router-link to="/addEvent" class="nav-link">
+              Dodaj wydarzenie
+            </router-link>
+          </li>
+        </div>
+      </div>
+
       <div v-if="!currentUser" class="navbar-nav ml-auto">
         <li class="nav-item">
           <router-link to="/register" class="nav-link">
