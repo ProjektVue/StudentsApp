@@ -4,7 +4,10 @@
 
 ## Build Setup
 
-``` bash
+Requirement:
+nodejs8
+
+```bash
 # install dependencies
 npm install
 
