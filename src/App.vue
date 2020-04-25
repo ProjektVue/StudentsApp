@@ -1,26 +1,18 @@
 <template>
-  <div id="app">
-    <top-header></top-header>
-    <router-view/>
-  </div>
+	<div id="app">
+		<Navigation v-if="currentUser"></Navigation>
+		<router-view />
+	</div>
 </template>
 
-  <script>
-  import Header from "./components/Top-Header";
+<script>
+import { mapState } from "vuex";
+import Navigation from "./components/Navigation.vue";
 
-  export default {
-    components: {
-      "top-header": Header
-    }
-  }
+export default {
+	components: { Navigation },
+	computed: {
+		...mapState(["currentUser"])
+	}
+};
 </script>
-
-<style scoped>
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-  }
-</style>
