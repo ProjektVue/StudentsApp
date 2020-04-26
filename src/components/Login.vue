@@ -236,8 +236,9 @@ export default {
               .doc(result.user.uid)
               .set({
                 country: this.signupForm.country,
-                fullName: this.signupForm.name,
+                name: this.signupForm.name,
                 city: this.signupForm.city,
+                email: this.signupForm.email,
                 friends: [],
                 events: [],
               })

@@ -13,6 +13,9 @@
             <router-link to="create_event">Create Event</router-link>
           </li>
           <li>
+            <router-link to="users">Users</router-link>
+          </li>
+          <li>
             <a @click="logout">logout</a>
           </li>
         </ul>
