@@ -2,7 +2,8 @@
   <div>
     <div id="dashboard">
       <section>
-        <b-container v-if="allUsers.length">
+        <b-container v-if="friends.length">
+          <h2 class="mt-4">Friends</h2>
           <b-row
             class="mt-4"
             cols="1"
@@ -11,39 +12,66 @@
             cols-lg="4"
             align-v="center"
           >
-            <b-col v-for="user in allUsers" :key="user.email">
-              <span v-if="currentUser.uid !== user.uid">
-                <b-card
-                  :title="user.name"
-                  :sub-title="user.email"
-                  class="mb-4"
-                  :img-src="user.avatar"
-                  alt="Image"
-                  img-top
+            <b-col v-for="user in friends" :key="user.email">
+              <b-card
+                :title="user.name"
+                :sub-title="user.email"
+                class="mb-4"
+                :img-src="user.avatar"
+                alt="Image"
+                img-top
+              >
+                <b-card-text>
+                  {{ user.city + ", " + user.country }}
+                </b-card-text>
+                <b-button
+                  @click="removeFriend(user.uid)"
+                  type="submit"
+                  variant="danger"
+                  >Remove friend</b-button
                 >
-                  <b-card-text>
-                    {{ user.city + ", " + user.country }}
-                  </b-card-text>
-                  <b-button
-                    v-if="userProfile.friends.includes(user.uid)"
-                    @click="removeFriend(user.uid)"
-                    type="submit"
-                    variant="danger"
-                    >Remove friend</b-button
-                  >
-                  <b-button
-                    v-else
-                    @click="addFriend(user.uid)"
-                    type="submit"
-                    variant="success"
-                    >Add friend</b-button
-                  >
-                </b-card>
-              </span>
+              </b-card>
             </b-col>
           </b-row>
         </b-container>
-        <div v-else>
+      </section>
+    </div>
+    <div id="dashboard">
+      <section>
+        <b-container v-if="otherUsers.length">
+          <div class="mt-4" v-if="!friends.length"></div>
+          <h2>Other Users</h2>
+          <b-row
+            class="mt-4"
+            cols="1"
+            cols-sm="2"
+            cols-md="2"
+            cols-lg="4"
+            align-v="center"
+          >
+            <b-col v-for="user in otherUsers" :key="user.email">
+              <b-card
+                :title="user.name"
+                :sub-title="user.email"
+                class="mb-4"
+                :img-src="user.avatar"
+                alt="Image"
+                img-top
+              >
+                <b-card-text>
+                  {{ user.city + ", " + user.country }}
+                </b-card-text>
+                <b-button
+                  @click="addFriend(user.uid)"
+                  type="submit"
+                  variant="success"
+                  >Add friend</b-button
+                >
+              </b-card>
+            </b-col>
+          </b-row>
+        </b-container>
+        <div v-if="!otherUsers.length && !friends.length">
           <p class="no-results">There are currently no users</p>
         </div>
       </section>
@@ -62,6 +90,18 @@ export default {
   },
   computed: {
     ...mapState(["userProfile", "currentUser", "allUsers"]),
+    friends() {
+      return this.allUsers.filter((user) =>
+        this.userProfile.friends.includes(user.uid)
+      );
+    },
+    otherUsers() {
+      return this.allUsers.filter(
+        (user) =>
+          !this.userProfile.friends.includes(user.uid) &&
+          this.currentUser.uid !== user.uid
+      );
+    },
   },
   methods: {
     addFriend(friendId) {
