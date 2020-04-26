@@ -49,15 +49,14 @@ export const store = new Vuex.Store({
       fb.usersCollection.get().then(function(querySnapshot) {
         querySnapshot.forEach(function(doc) {
           const userData = doc.data();
-          for (let i = 0; i < 20; i++) {
-            users.push({
-              email: userData.email,
-              name: userData.name,
-              country: userData.country,
-              city: userData.city,
-              avatar: userData.avatar,
-            });
-          }
+          users.push({
+            uid: doc.id,
+            email: userData.email,
+            name: userData.name,
+            country: userData.country,
+            city: userData.city,
+            avatar: userData.avatar,
+          });
         });
       });
       commit("setAllUsers", users);

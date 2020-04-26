@@ -12,21 +12,34 @@
             align-v="center"
           >
             <b-col v-for="user in allUsers" :key="user.email">
-              <b-card
-                :title="user.name"
-                :sub-title="user.email"
-                class="mb-4"
-                :img-src="user.avatar"
-                alt="Image"
-                img-top
-              >
-                <b-card-text>
-                  {{ user.city + ", " + user.country }}
-                </b-card-text>
-                <b-button @click="createEvent" type="submit" variant="success"
-                  >Add friend</b-button
+              <span v-if="currentUser.uid !== user.uid">
+                <b-card
+                  :title="user.name"
+                  :sub-title="user.email"
+                  class="mb-4"
+                  :img-src="user.avatar"
+                  alt="Image"
+                  img-top
                 >
-              </b-card>
+                  <b-card-text>
+                    {{ user.city + ", " + user.country }}
+                  </b-card-text>
+                  <b-button
+                    v-if="userProfile.friends.includes(user.uid)"
+                    @click="removeFriend(user.uid)"
+                    type="submit"
+                    variant="danger"
+                    >Remove friend</b-button
+                  >
+                  <b-button
+                    v-else
+                    @click="addFriend(user.uid)"
+                    type="submit"
+                    variant="success"
+                    >Add friend</b-button
+                  >
+                </b-card>
+              </span>
             </b-col>
           </b-row>
         </b-container>
@@ -51,7 +64,36 @@ export default {
     ...mapState(["userProfile", "currentUser", "allUsers"]),
   },
   methods: {
-    showNewPosts() {
+    addFriend(friendId) {
+      fb.usersCollection
+        .doc(this.currentUser.uid)
+        .update({
+          friends: [...this.userProfile.friends, friendId],
+        })
+        .then(() => {
+          this.$store.dispatch("fetchUserProfile");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      return;
+    },
+    removeFriend(friendId) {
+      const friends = this.userProfile.friends.filter(
+        (friend) => !(friend === friendId)
+      );
+      console.log(friends);
+      fb.usersCollection
+        .doc(this.currentUser.uid)
+        .update({
+          friends,
+        })
+        .then(() => {
+          this.$store.dispatch("fetchUserProfile");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       return;
     },
   },
