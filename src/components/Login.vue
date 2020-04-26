@@ -10,8 +10,7 @@
         <h1>Student App</h1>
         <p>
           Welcome to the Student App sample social media web app powered by
-          Vue.js and Firebase. Build this project by checking out The Definitive
-          Guide to Getting Started with Vue.js
+          Vue.js and Firebase.
         </p>
       </div>
       <div
@@ -20,89 +19,118 @@
           'signup-form': !showLoginForm && !showForgotPassword,
         }"
       >
-        <form v-if="showLoginForm" @submit.prevent>
+        <b-form @submit.prevent v-if="showLoginForm">
           <h1>Welcome Back</h1>
-
-          <label for="email1">Email</label>
-          <input
-            v-model.trim="loginForm.email"
-            type="text"
-            placeholder="you@email.com"
-            id="email1"
-          />
-
-          <label for="password1">Password</label>
-          <input
-            v-model.trim="loginForm.password"
-            type="password"
-            placeholder="******"
-            id="password1"
-          />
-
-          <button @click="login" class="button">Log In</button>
-
+          <b-form-group
+            id="input-group-1"
+            label="Email address:"
+            label-for="input-1"
+          >
+            <b-form-input
+              id="input-1"
+              v-model="loginForm.email"
+              type="email"
+              required
+              placeholder="Enter email"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group
+            id="input-group-2"
+            label="Password"
+            label-for="text-password"
+          >
+            <b-input
+              type="password"
+              id="text-password"
+              v-model="loginForm.password"
+            ></b-input>
+          </b-form-group>
+          <b-button @click="login" type="submit" variant="primary"
+            >Login</b-button
+          >
           <div class="extras">
             <a @click="togglePasswordReset">Forgot Password</a>
             <a @click="toggleForm">Create an Account</a>
           </div>
-        </form>
-        <form v-if="!showLoginForm && !showForgotPassword" @submit.prevent>
-          <h1>Get Started</h1>
-
-          <label for="name">Name</label>
-          <input
-            v-model.trim="signupForm.name"
-            type="text"
-            placeholder="Savvy Apps"
-            id="name"
-          />
-
-          <label for="title">Title</label>
-          <input
-            v-model.trim="signupForm.title"
-            type="text"
-            placeholder="Company"
-            id="title"
-          />
-
-          <label for="email2">Email</label>
-          <input
-            v-model.trim="signupForm.email"
-            type="text"
-            placeholder="you@email.com"
-            id="email2"
-          />
-
-          <label for="password2">Password</label>
-          <input
-            v-model.trim="signupForm.password"
-            type="password"
-            placeholder="min 6 characters"
-            id="password2"
-          />
-
-          <button @click="signup" class="button">Sign Up</button>
-
+        </b-form>
+        <b-form @submit.prevent v-if="!showLoginForm && !showForgotPassword">
+          <h1>Welcome Back</h1>
+          <b-form-group id="input-group-2" label="Name:" label-for="input-2">
+            <b-form-input
+              id="input-2"
+              v-model="signupForm.name"
+              placeholder="John Smith"
+              required
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group id="input-group-3" label="Country:" label-for="input-3">
+            <b-form-input
+              id="input-3"
+              v-model="signupForm.country"
+              placeholder="Poland"
+              required
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group id="input-group-4" label="City:" label-for="input-5">
+            <b-form-input
+              id="input-5"
+              v-model="signupForm.city"
+              placeholder="Krakow"
+              required
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group
+            id="input-group-6"
+            label="Email address:"
+            label-for="input-6"
+            description="We'll never share your email with anyone else."
+          >
+            <b-form-input
+              id="input-1"
+              v-model="signupForm.email"
+              type="email"
+              required
+              placeholder="Enter email"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group id="input-group-7" label="Password" label-for="input-7">
+            <b-input
+              type="password"
+              id="text-password"
+              v-model="signupForm.password"
+            ></b-input>
+            <b-form-text id="password-help-block">
+              Your password must be at least 6 characters.
+            </b-form-text>
+          </b-form-group>
+          <b-button @click="signup" type="submit" variant="primary"
+            >Create account</b-button
+          >
           <div class="extras">
             <a @click="toggleForm">Back to Log In</a>
           </div>
-        </form>
+        </b-form>
         <form v-if="showForgotPassword" @submit.prevent class="password-reset">
           <div v-if="!passwordResetSuccess">
             <h1>Reset Password</h1>
             <p>We will send you an email to reset your password</p>
+            <b-form-group
+              id="input-group-6"
+              label="Email address:"
+              label-for="input-6"
+            >
+              <b-form-input
+                id="input-1"
+                v-model="passwordForm.email"
+                type="email"
+                required
+                placeholder="Enter email"
+              ></b-form-input>
+            </b-form-group>
 
-            <label for="email3">Email</label>
-            <input
-              v-model.trim="passwordForm.email"
-              type="text"
-              placeholder="you@email.com"
-              id="email3"
-            />
-
-            <button @click="resetPassword" class="button">
-              Submit
-            </button>
+            <b-button @click="resetPassword" type="submit" variant="primary"
+              >Reset password</b-button
+            >
 
             <div class="extras">
               <a @click="togglePasswordReset">Back to Log In</a>
@@ -130,6 +158,7 @@
 
 <script>
 const fb = require("../firebaseConfig.js");
+import isValidForm from "../utils/isValidForm";
 
 export default {
   data() {
@@ -139,8 +168,9 @@ export default {
         password: "",
       },
       signupForm: {
+        country: "",
         name: "",
-        title: "",
+        city: "",
         email: "",
         password: "",
       },
@@ -190,39 +220,44 @@ export default {
         });
     },
     signup() {
-      this.performingRequest = true;
+      if (isValidForm(this.signupForm)) {
+        this.performingRequest = true;
 
-      fb.auth
-        .createUserWithEmailAndPassword(
-          this.signupForm.email,
-          this.signupForm.password
-        )
-        .then((result) => {
-          this.$store.commit("setCurrentUser", result.user);
+        fb.auth
+          .createUserWithEmailAndPassword(
+            this.signupForm.email,
+            this.signupForm.password
+          )
+          .then((result) => {
+            this.$store.commit("setCurrentUser", result.user);
 
-          // create user obj
-          fb.usersCollection
-            .doc(user.uid)
-            .set({
-              name: this.signupForm.name,
-              title: this.signupForm.title,
-            })
-            .then(() => {
-              this.$store.dispatch("fetchUserProfile");
-              this.performingRequest = false;
-              this.$router.push("/dashboard");
-            })
-            .catch((err) => {
-              console.log(err);
-              this.performingRequest = false;
-              this.errorMsg = err.message;
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-          this.performingRequest = false;
-          this.errorMsg = err.message;
-        });
+            // create user obj
+            fb.usersCollection
+              .doc(result.user.uid)
+              .set({
+                country: this.signupForm.country,
+                fullName: this.signupForm.name,
+                city: this.signupForm.city,
+                friends: [],
+                events: [],
+              })
+              .then(() => {
+                this.$store.dispatch("fetchUserProfile");
+                this.performingRequest = false;
+                this.$router.push("/dashboard");
+              })
+              .catch((err) => {
+                console.log(err);
+                this.performingRequest = false;
+                this.errorMsg = err.message;
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+            this.performingRequest = false;
+            this.errorMsg = err.message;
+          });
+      }
     },
     resetPassword() {
       this.performingRequest = true;
