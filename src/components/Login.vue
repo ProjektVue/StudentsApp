@@ -159,6 +159,7 @@
 <script>
 const fb = require("../firebaseConfig.js");
 import isValidForm from "../utils/isValidForm";
+import MD5 from "crypto-js/md5";
 
 export default {
   data() {
@@ -239,6 +240,7 @@ export default {
                 name: this.signupForm.name,
                 city: this.signupForm.city,
                 email: this.signupForm.email,
+                avatar: this.getAvatarLink(this.signupForm.email),
                 friends: [],
                 events: [],
               })
@@ -258,6 +260,12 @@ export default {
             this.performingRequest = false;
             this.errorMsg = err.message;
           });
+      }
+    },
+    getAvatarLink(email) {
+      const gravatarUrl = "https://www.gravatar.com/avatar";
+      if (email) {
+        return `${gravatarUrl}/${MD5(email.toLowerCase().trim())}`;
       }
     },
     resetPassword() {

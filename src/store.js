@@ -55,6 +55,7 @@ export const store = new Vuex.Store({
               name: userData.name,
               country: userData.country,
               city: userData.city,
+              avatar: userData.avatar,
             });
           }
         });
