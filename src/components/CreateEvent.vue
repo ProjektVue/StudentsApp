@@ -69,6 +69,7 @@ import { mapState } from "vuex";
 import moment from "moment";
 const fb = require("../firebaseConfig.js");
 import Datepicker from "vuejs-datepicker";
+import isValidForm from "../utils/isValidForm";
 
 export default {
   components: {
@@ -99,20 +100,11 @@ export default {
         description: "",
       };
     },
-    isValidForm() {
-      let isValid = true;
-      Object.values(this.event).forEach((prop) => {
-        if (!(prop.length > 0)) {
-          isValid = false;
-        }
-      });
-      return isValid;
-    },
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
     },
     createEvent() {
-      if (this.isValidForm()) {
+      if (isValidForm(this.event)) {
         fb.eventsCollection
           .add({
             createdOn: new Date(),
