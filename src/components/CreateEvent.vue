@@ -1,5 +1,5 @@
 <template>
-  <section id="settings">
+  <section id="event-create-form">
     <div class="col1">
       <b-alert
         variant="success"
@@ -10,27 +10,55 @@
         >Event created</b-alert
       >
       <h3>Create Event</h3>
-      <p>Create New Event</p>
-      <div class="create-post">
-        <form @submit.prevent>
-          <label for="name">Name</label>
-          <input v-model.trim="event.name" id="name" />
-          <label for="name">Place</label>
-          <input v-model.trim="event.place" id="name" />
-          <label for="name">Date</label>
-          <datepicker v-model="event.date" name="uniquename"></datepicker>
-          <label for="name">Event Start Time</label>
-          <input v-model="event.time" type="time" id="appt" name="appt" />
-          <label for="description">Description</label>
-          <textarea v-model.trim="event.content"></textarea>
-          <button
-            @click="createPost"
-            :disabled="event.content == ''"
-            class="button"
+      <div>
+        <b-form @submit.prevent>
+          <b-form-group id="input-group-1" label="Name:" label-for="input-1">
+            <b-form-input
+              id="input-1"
+              v-model="event.name"
+              required
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group id="input-group-2" label="Place:" label-for="input-2">
+            <b-form-input
+              id="input-2"
+              v-model="event.place"
+              required
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group id="input-group-3" label="Date:" label-for="input-3">
+            <b-form-datepicker
+              id="example-datepicker"
+              v-model="event.date"
+              class="mb-2"
+              required
+            ></b-form-datepicker>
+          </b-form-group>
+          <b-form-group id="input-group-4" label="Time:" label-for="input-4">
+            <b-form-timepicker
+              v-model="event.time"
+              locale="en"
+              required
+            ></b-form-timepicker>
+          </b-form-group>
+          <b-form-group
+            id="input-group-5"
+            label="Description:"
+            label-for="input-5"
           >
-            Add Event
-          </button>
-        </form>
+            <b-form-textarea
+              id="textarea"
+              v-model="event.description"
+              placeholder="Enter event description..."
+              rows="3"
+              max-rows="6"
+              required
+            ></b-form-textarea>
+          </b-form-group>
+          <b-button @click="createEvent" type="submit" variant="primary"
+            >Add event</b-button
+          >
+        </b-form>
       </div>
     </div>
   </section>
@@ -41,7 +69,6 @@ import { mapState } from "vuex";
 import moment from "moment";
 const fb = require("../firebaseConfig.js");
 import Datepicker from "vuejs-datepicker";
-import { DropdownPlugin } from "bootstrap-vue";
 
 export default {
   components: {
@@ -72,29 +99,40 @@ export default {
         description: "",
       };
     },
+    isValidForm() {
+      let isValid = true;
+      Object.values(this.event).forEach((prop) => {
+        if (!(prop.length > 0)) {
+          isValid = false;
+        }
+      });
+      return isValid;
+    },
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown;
     },
-    createPost() {
-      fb.eventsCollection
-        .add({
-          createdOn: new Date(),
-          userId: this.currentUser.uid,
-          place: this.event.place,
-          date: this.event.date,
-          description: this.event.description,
-          time: this.event.time,
-          comments: 0,
-          likes: 0,
-          participants: 0,
-        })
-        .then((ref) => {
-          this.dismissCountDown = 4;
-          this.clearEvent();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    createEvent() {
+      if (this.isValidForm()) {
+        fb.eventsCollection
+          .add({
+            createdOn: new Date(),
+            userId: this.currentUser.uid,
+            place: this.event.place,
+            date: this.event.date,
+            description: this.event.description,
+            time: this.event.time,
+            comments: 0,
+            likes: 0,
+            participants: 0,
+          })
+          .then((ref) => {
+            this.dismissCountDown = 4;
+            this.clearEvent();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     },
   },
 };
