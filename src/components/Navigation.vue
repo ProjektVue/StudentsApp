@@ -10,12 +10,6 @@
             <router-link to="dashboard">Dashboard</router-link>
           </li>
           <li>
-            <router-link to="settings">Settings</router-link>
-          </li>
-          <li>
-            <router-link to="users">Users</router-link>
-          </li>
-          <li>
             <router-link to="create_event">Create Event</router-link>
           </li>
           <li>
@@ -39,10 +33,10 @@ export default {
           this.$store.dispatch("clearData");
           this.$router.push("/login");
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err);
         });
-    }
-  }
+    },
+  },
 };
 </script>

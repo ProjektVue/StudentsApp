@@ -3,9 +3,6 @@ import Router from "vue-router";
 import firebase from "firebase";
 
 import Login from "@/components/Login";
-import Users from "@/components/Users";
-import Dashboard from "@/components/Dashboard";
-import Settings from "@/components/Settings";
 import CreateEvent from "@/components/CreateEvent";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
@@ -31,23 +28,7 @@ const router = new Router({
     {
       path: "/dashboard",
       name: "Dashboard",
-      component: Dashboard,
-      meta: {
-        requiresAuth: true,
-      },
-    },
-    {
-      path: "/settings",
-      name: "Settings",
-      component: Settings,
-      meta: {
-        requiresAuth: true,
-      },
-    },
-    {
-      path: "/users",
-      name: "Users",
-      component: Users,
+      component: CreateEvent,
       meta: {
         requiresAuth: true,
       },
