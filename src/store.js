@@ -15,6 +15,8 @@ fb.auth.onAuthStateChanged((user) => {
       console.log("user, profile", doc.data());
       store.commit("setUserProfile", doc.data());
     });
+
+    store.dispatch("fetchEvents");
   }
 });
 
@@ -22,7 +24,7 @@ export const store = new Vuex.Store({
   state: {
     currentUser: null,
     userProfile: {},
-    posts: [],
+    events: [],
     hiddenPosts: [],
     allUsers: [],
   },
@@ -61,6 +63,24 @@ export const store = new Vuex.Store({
       });
       commit("setAllUsers", users);
     },
+    fetchEvents({ commit, state }) {
+      // realtime updates from our posts collection
+      fb.eventsCollection.orderBy("date").onSnapshot((querySnapshot) => {
+        let eventsArray = [];
+        let numberOfEventsCreatedByUser = 0;
+        querySnapshot.forEach((doc) => {
+          let event = doc.data();
+          event.id = doc.id;
+          if (state.currentUser.uid === event.userId) {
+            event.isCurrentUserEvent = true;
+            numberOfEventsCreatedByUser++;
+          }
+          eventsArray.push(event);
+        });
+        commit("setNumberOfEventsCreatedByUser", numberOfEventsCreatedByUser);
+        commit("setEvents", eventsArray);
+      });
+    },
   },
   mutations: {
     setCurrentUser(state, val) {
@@ -69,12 +89,18 @@ export const store = new Vuex.Store({
     setUserProfile(state, val) {
       state.userProfile = val;
     },
+    setEvents(state, val) {
+      state.events = val;
+    },
     setAllUsers(state, val) {
       if (val) {
         state.allUsers = val;
       } else {
         state.allUsers = [];
       }
+    },
+    setNumberOfEventsCreatedByUser(state, val) {
+      state.userProfile.numberOfEventsCreatedByUser = val;
     },
   },
 });

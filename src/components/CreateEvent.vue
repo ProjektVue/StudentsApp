@@ -113,9 +113,9 @@ export default {
             date: this.event.date,
             description: this.event.description,
             time: this.event.time,
-            comments: 0,
-            likes: 0,
             participants: 0,
+            createdBy: this.userProfile.name,
+            name: this.event.name,
           })
           .then((ref) => {
             this.dismissCountDown = 4;
