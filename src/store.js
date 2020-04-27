@@ -23,6 +23,7 @@ fb.auth.onAuthStateChanged((user) => {
 export const store = new Vuex.Store({
   state: {
     currentUser: null,
+    numberOfEventsCreatedByUser: 0,
     userProfile: {},
     events: [],
     hiddenPosts: [],
@@ -100,7 +101,7 @@ export const store = new Vuex.Store({
       }
     },
     setNumberOfEventsCreatedByUser(state, val) {
-      state.userProfile.numberOfEventsCreatedByUser = val;
+      state.numberOfEventsCreatedByUser = val;
     },
   },
 });

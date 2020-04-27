@@ -14,32 +14,37 @@
                 class="mb-4"
               >
                 <b-card-text>
-                  <b-avatar
-                    variant="info"
-                    :src="userProfile.avatar"
-                    class="mr-3"
-                  ></b-avatar>
-                  <span class="mr-auto">{{ userProfile.name }}</span>
-                </b-card-text>
-                <b-card-text>
-                  <small
-                    >{{ userProfile.email }}
-                    <br />
-                    {{ userProfile.city + ", " + userProfile.country }}
-                    <br />
-                    {{ userProfile.friends.length }}
-                    {{
-                      userProfile.friends.length === 1 ? "friend" : "friends"
-                    }}
-                    <br />
-                    {{ userProfile.numberOfEventsCreatedByUser }}
-                    {{
-                      userProfile.numberOfEventsCreatedByUser === 1
-                        ? "event"
-                        : "events"
-                    }}
-                    created
-                  </small>
+                  <b-row>
+                    <b-col align-self="center">
+                      <img
+                        style="min-width: 6rem;"
+                        variant="info"
+                        :src="userProfile.avatar"
+                      />
+                    </b-col>
+                    <b-col>
+                      {{ userProfile.name }}
+                      <br />
+                      <small
+                        >{{ userProfile.email }}
+                        <br />
+                        {{ userProfile.city + ", " + userProfile.country }}
+                        <br />
+                        {{ userProfile.friends.length }}
+                        {{
+                          userProfile.friends.length === 1
+                            ? "friend"
+                            : "friends"
+                        }}
+                        <br />
+                        {{ numberOfEventsCreatedByUser }}
+                        {{
+                          numberOfEventsCreatedByUser === 1 ? "event" : "events"
+                        }}
+                        created
+                      </small>
+                    </b-col>
+                  </b-row>
                 </b-card-text>
               </b-card>
             </b-col>
@@ -85,53 +90,14 @@ export default {
     return {};
   },
   computed: {
-    ...mapState(["userProfile", "currentUser", "allUsers", "events"]),
-    friends() {
-      return this.allUsers.filter((user) =>
-        this.userProfile.friends.includes(user.uid)
-      );
-    },
-    otherUsers() {
-      return this.allUsers.filter(
-        (user) =>
-          !this.userProfile.friends.includes(user.uid) &&
-          this.currentUser.uid !== user.uid
-      );
-    },
+    ...mapState([
+      "userProfile",
+      "currentUser",
+      "allUsers",
+      "events",
+      "numberOfEventsCreatedByUser",
+    ]),
   },
-  methods: {
-    addFriend(friendId) {
-      fb.usersCollection
-        .doc(this.currentUser.uid)
-        .update({
-          friends: [...this.userProfile.friends, friendId],
-        })
-        .then(() => {
-          this.$store.dispatch("fetchUserProfile");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      return;
-    },
-    removeFriend(friendId) {
-      const friends = this.userProfile.friends.filter(
-        (friend) => !(friend === friendId)
-      );
-      console.log(friends);
-      fb.usersCollection
-        .doc(this.currentUser.uid)
-        .update({
-          friends,
-        })
-        .then(() => {
-          this.$store.dispatch("fetchUserProfile");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      return;
-    },
-  },
+  methods: {},
 };
 </script>
