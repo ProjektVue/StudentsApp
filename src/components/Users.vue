@@ -1,0 +1,141 @@
+<template>
+  <div>
+    <div id="dashboard">
+      <section>
+        <b-container v-if="friends.length">
+          <h2 class="mt-4">Friends</h2>
+          <b-row
+            class="mt-4"
+            cols="1"
+            cols-sm="2"
+            cols-md="2"
+            cols-lg="4"
+            align-v="center"
+          >
+            <b-col v-for="user in friends" :key="user.email">
+              <b-card
+                :title="user.name"
+                :sub-title="user.email"
+                class="mb-4"
+                :img-src="user.avatar"
+                alt="Image"
+                img-top
+              >
+                <b-card-text>
+                  {{ user.city + ", " + user.country }}
+                </b-card-text>
+                <b-button
+                  @click="removeFriend(user.uid)"
+                  type="submit"
+                  variant="danger"
+                  >Remove friend</b-button
+                >
+              </b-card>
+            </b-col>
+          </b-row>
+        </b-container>
+      </section>
+    </div>
+    <div id="dashboard">
+      <section>
+        <b-container v-if="otherUsers.length">
+          <div class="mt-4" v-if="!friends.length"></div>
+          <h2>Other Users</h2>
+          <b-row
+            class="mt-4"
+            cols="1"
+            cols-sm="2"
+            cols-md="2"
+            cols-lg="4"
+            align-v="center"
+          >
+            <b-col v-for="user in otherUsers" :key="user.email">
+              <b-card
+                :title="user.name"
+                :sub-title="user.email"
+                class="mb-4"
+                :img-src="user.avatar"
+                alt="Image"
+                img-top
+              >
+                <b-card-text>
+                  {{ user.city + ", " + user.country }}
+                </b-card-text>
+                <b-button
+                  @click="addFriend(user.uid)"
+                  type="submit"
+                  variant="success"
+                  >Add friend</b-button
+                >
+              </b-card>
+            </b-col>
+          </b-row>
+        </b-container>
+        <div v-if="!otherUsers.length && !friends.length">
+          <p class="no-results">There are currently no users</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapState } from "vuex";
+import moment from "moment";
+const fb = require("../firebaseConfig.js");
+
+export default {
+  data() {
+    return {};
+  },
+  computed: {
+    ...mapState(["userProfile", "currentUser", "allUsers"]),
+    friends() {
+      return this.allUsers.filter((user) =>
+        this.userProfile.friends.includes(user.uid)
+      );
+    },
+    otherUsers() {
+      return this.allUsers.filter(
+        (user) =>
+          !this.userProfile.friends.includes(user.uid) &&
+          this.currentUser.uid !== user.uid
+      );
+    },
+  },
+  methods: {
+    addFriend(friendId) {
+      fb.usersCollection
+        .doc(this.currentUser.uid)
+        .update({
+          friends: [...this.userProfile.friends, friendId],
+        })
+        .then(() => {
+          this.$store.dispatch("fetchUserProfile");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      return;
+    },
+    removeFriend(friendId) {
+      const friends = this.userProfile.friends.filter(
+        (friend) => !(friend === friendId)
+      );
+      console.log(friends);
+      fb.usersCollection
+        .doc(this.currentUser.uid)
+        .update({
+          friends,
+        })
+        .then(() => {
+          this.$store.dispatch("fetchUserProfile");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      return;
+    },
+  },
+};
+</script>

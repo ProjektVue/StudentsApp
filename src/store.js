@@ -9,6 +9,7 @@ fb.auth.onAuthStateChanged((user) => {
   if (user) {
     store.commit("setCurrentUser", user);
     store.dispatch("fetchUserProfile");
+    store.dispatch("fetchAllUsers");
 
     fb.usersCollection.doc(user.uid).onSnapshot((doc) => {
       console.log("user, profile", doc.data());
@@ -23,6 +24,7 @@ export const store = new Vuex.Store({
     userProfile: {},
     posts: [],
     hiddenPosts: [],
+    allUsers: [],
   },
   actions: {
     clearData({ commit }) {
@@ -42,6 +44,23 @@ export const store = new Vuex.Store({
           console.log(err);
         });
     },
+    fetchAllUsers({ commit, state }) {
+      const users = [];
+      fb.usersCollection.get().then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+          const userData = doc.data();
+          users.push({
+            uid: doc.id,
+            email: userData.email,
+            name: userData.name,
+            country: userData.country,
+            city: userData.city,
+            avatar: userData.avatar,
+          });
+        });
+      });
+      commit("setAllUsers", users);
+    },
   },
   mutations: {
     setCurrentUser(state, val) {
@@ -49,6 +68,13 @@ export const store = new Vuex.Store({
     },
     setUserProfile(state, val) {
       state.userProfile = val;
+    },
+    setAllUsers(state, val) {
+      if (val) {
+        state.allUsers = val;
+      } else {
+        state.allUsers = [];
+      }
     },
   },
 });
