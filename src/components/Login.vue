@@ -55,6 +55,31 @@
         </b-form>
         <b-form @submit.prevent v-if="!showLoginForm && !showForgotPassword">
           <h1>Welcome Back</h1>
+          <b-form-group
+            id="input-group-6"
+            label="Email address:"
+            label-for="input-6"
+            description="We'll never share your email with anyone else."
+          >
+            <b-form-input
+              @input="isTyping = true"
+              v-model="signUpEmail"
+              id="input-1"
+              type="email"
+              required
+              placeholder="Enter email"
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group id="input-group-7" label="Password" label-for="input-7">
+            <b-input
+              type="password"
+              id="text-password"
+              v-model="signupForm.password"
+            ></b-input>
+            <b-form-text id="password-help-block">
+              Your password must be at least 6 characters.
+            </b-form-text>
+          </b-form-group>
           <b-form-group id="input-group-2" label="Name:" label-for="input-2">
             <b-form-input
               id="input-2"
@@ -78,30 +103,6 @@
               placeholder="Krakow"
               required
             ></b-form-input>
-          </b-form-group>
-          <b-form-group
-            id="input-group-6"
-            label="Email address:"
-            label-for="input-6"
-            description="We'll never share your email with anyone else."
-          >
-            <b-form-input
-              id="input-1"
-              v-model="signupForm.email"
-              type="email"
-              required
-              placeholder="Enter email"
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group id="input-group-7" label="Password" label-for="input-7">
-            <b-input
-              type="password"
-              id="text-password"
-              v-model="signupForm.password"
-            ></b-input>
-            <b-form-text id="password-help-block">
-              Your password must be at least 6 characters.
-            </b-form-text>
           </b-form-group>
           <b-button @click="signup" type="submit" variant="primary"
             >Create account</b-button
@@ -159,7 +160,9 @@
 <script>
 const fb = require("../firebaseConfig.js");
 import isValidForm from "../utils/isValidForm";
-import MD5 from "crypto-js/md5";
+import createGravatarHash from "../utils/createGravatarHash";
+import axios from "axios";
+import _ from "lodash";
 
 export default {
   data() {
@@ -172,7 +175,6 @@ export default {
         country: "",
         name: "",
         city: "",
-        email: "",
         password: "",
       },
       passwordForm: {
@@ -183,6 +185,12 @@ export default {
       passwordResetSuccess: false,
       performingRequest: false,
       errorMsg: "",
+      signUpEmail: "",
+      isTyping: false,
+      searchResult: [],
+      isLoading: false,
+      gravatarApi: process.env.VUE_APP_GRAVATAR_API_URL,
+      gravatarAvatarUrl: process.env.VUE_APP_GRAVATAR_AVATAR_URL,
     };
   },
   methods: {
@@ -226,7 +234,7 @@ export default {
 
         fb.auth
           .createUserWithEmailAndPassword(
-            this.signupForm.email,
+            this.signUpEmail,
             this.signupForm.password
           )
           .then((result) => {
@@ -239,8 +247,8 @@ export default {
                 country: this.signupForm.country,
                 name: this.signupForm.name,
                 city: this.signupForm.city,
-                email: this.signupForm.email,
-                avatar: this.getAvatarLink(this.signupForm.email),
+                email: this.signUpEmail,
+                avatar: this.getAvatarLink(this.signUpEmail),
                 friends: [],
                 events: [],
               })
@@ -263,9 +271,8 @@ export default {
       }
     },
     getAvatarLink(email) {
-      const gravatarUrl = "https://www.gravatar.com/avatar";
       if (email) {
-        return `${gravatarUrl}/${MD5(email.toLowerCase().trim())}`;
+        return `${this.gravatarAvatarUrl}/${createGravatarHash(email)}`;
       }
     },
     resetPassword() {
@@ -283,6 +290,35 @@ export default {
           this.performingRequest = false;
           this.errorMsg = err.message;
         });
+    },
+    searchUserByEmail(searchQuery) {
+      this.isLoading = true;
+      const hash = createGravatarHash(searchQuery);
+      axios
+        .get(`${this.gravatarApi}/${hash}.json`)
+        .then((response) => {
+          this.isLoading = false;
+          if (
+            response &&
+            response.data &&
+            response.data.entry &&
+            response.data.entry.length
+          ) {
+            this.signupForm.name = response.data.entry[0].preferredUsername;
+          }
+          this.searchResult = response.data.items;
+        })
+        .catch((e) => (this.isLoading = false));
+    },
+  },
+  watch: {
+    signUpEmail: _.debounce(function() {
+      this.isTyping = false;
+    }, 1000),
+    isTyping(value) {
+      if (!value) {
+        this.searchUserByEmail(this.signUpEmail);
+      }
     },
   },
 };
