@@ -2,15 +2,20 @@
 
 > Portal społecznościowy dla studentów
 
+## Setup project
+
+1. Install dependencies
+
+`npm install`
+
+2. Copy `env.local.sample` to `env.local` and add API_KEY
+
 ## Build Setup
 
 Requirement:
 nodejs12
 
 ```bash
-# install dependencies
-npm install
-
 # serve with hot reload at localhost:8080
 npm run serve
 

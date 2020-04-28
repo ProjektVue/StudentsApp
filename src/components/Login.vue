@@ -191,12 +191,53 @@ export default {
       isLoading: false,
       gravatarApi: process.env.VUE_APP_GRAVATAR_API_URL,
       gravatarAvatarUrl: process.env.VUE_APP_GRAVATAR_AVATAR_URL,
+      geoApiKey: process.env.VUE_APP_GEO_API_KEY,
+      geoApiUrl: process.env.VUE_APP_GEO_API_URL,
     };
   },
   methods: {
+    prefillUserLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            axios
+              .get(`${this.geoApiUrl}?key=${this.geoApiKey}&q=${lat}%2C${long}`)
+              .then((response) => {
+                if (
+                  response &&
+                  response.data &&
+                  response.data.results &&
+                  response.data.results.length &&
+                  response.data.results[0].components
+                ) {
+                  const {
+                    town,
+                    country,
+                    city,
+                  } = response.data.results[0].components;
+                  this.signupForm.city = city || town;
+                  this.signupForm.country = country;
+                }
+                this.searchResult = response.data.items;
+              })
+              .catch((e) => {
+                console.error("Localization API not working");
+              });
+          },
+          (e) => {
+            console.error("Geolocation not supported");
+          }
+        );
+      }
+    },
     toggleForm() {
       this.errorMsg = "";
       this.showLoginForm = !this.showLoginForm;
+      if (!this.showLoginForm) {
+        this.prefillUserLocation();
+      }
     },
     togglePasswordReset() {
       if (this.showForgotPassword) {
