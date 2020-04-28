@@ -4,6 +4,7 @@ import firebase from "firebase";
 
 import Login from "@/components/Login";
 import CreateEvent from "@/components/CreateEvent";
+import Dashboard from "@/components/Dashboard";
 import Users from "@/components/Users";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
@@ -29,7 +30,7 @@ const router = new Router({
     {
       path: "/dashboard",
       name: "Dashboard",
-      component: CreateEvent,
+      component: Dashboard,
       meta: {
         requiresAuth: true,
       },
