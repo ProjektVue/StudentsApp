@@ -189,6 +189,8 @@ export default {
       isTyping: false,
       searchResult: [],
       isLoading: false,
+      gravatarApi: process.env.VUE_APP_GRAVATAR_API_URL,
+      gravatarAvatarUrl: process.env.GRAVATAR_AVATAR_URL,
     };
   },
   methods: {
@@ -269,9 +271,8 @@ export default {
       }
     },
     getAvatarLink(email) {
-      const gravatarUrl = "https://www.gravatar.com/avatar";
       if (email) {
-        return `${gravatarUrl}/${createGravatarHash(email)}`;
+        return `${this.gravatarAvatarUrl}/${createGravatarHash(email)}`;
       }
     },
     resetPassword() {
@@ -293,11 +294,8 @@ export default {
     searchUserByEmail(searchQuery) {
       this.isLoading = true;
       const hash = createGravatarHash(searchQuery);
-      // cors-anywhere to prevent issues with cors on local env.
       axios
-        .get(
-          `https://cors-anywhere.herokuapp.com/https://www.gravatar.com/${hash}.json`
-        )
+        .get(`${this.gravatarApi}/${hash}.json`)
         .then((response) => {
           this.isLoading = false;
           if (
@@ -309,7 +307,8 @@ export default {
             this.signupForm.name = response.data.entry[0].preferredUsername;
           }
           this.searchResult = response.data.items;
-        });
+        })
+        .catch((e) => (this.isLoading = false));
     },
   },
   watch: {
