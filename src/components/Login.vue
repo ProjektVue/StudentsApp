@@ -190,7 +190,7 @@ export default {
       searchResult: [],
       isLoading: false,
       gravatarApi: process.env.VUE_APP_GRAVATAR_API_URL,
-      gravatarAvatarUrl: process.env.GRAVATAR_AVATAR_URL,
+      gravatarAvatarUrl: process.env.VUE_APP_GRAVATAR_AVATAR_URL,
     };
   },
   methods: {
