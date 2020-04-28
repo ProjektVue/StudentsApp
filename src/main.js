@@ -1,21 +1,28 @@
-import Vue from 'vue'
-import App from './App'
-import router from './router'
-import { store } from './store.js'
-const fb = require('./firebaseConfig.js')
-import './assets/scss/app.scss'
+import Vue from "vue";
+import App from "./App";
+import router from "./router";
+import { store } from "./store.js";
+const fb = require("./firebaseConfig.js");
+import "./assets/scss/app.scss";
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 // handle page reloads
-let app
-fb.auth.onAuthStateChanged(user => {
-    if (!app) {
-        app = new Vue({
-            el: '#app',
-            router,
-            store,
-            render: h => h(App)
-        })
-    }
-})
+let app;
+fb.auth.onAuthStateChanged((user) => {
+  if (!app) {
+    app = new Vue({
+      el: "#app",
+      router,
+      store,
+      render: (h) => h(App),
+      created() {
+        if (sessionStorage.redirect) {
+          const redirect = sessionStorage.redirect;
+          delete sessionStorage.redirect;
+          this.$router.push(redirect);
+        }
+      },
+    });
+  }
+});

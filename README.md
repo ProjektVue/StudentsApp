@@ -24,9 +24,10 @@ Application is deployed on GitHub pages under https://projektvue.github.io/Stude
 
 To deploy:
 
-1. Create new branch with deployment version: `git checkout -b {version}`
-2. Run `npm run build`
-3. Add dist folder and commit: `git add dist -f && git commit -m {version}`
-4. Push dist folder to `gh-pages` branch: `git subtree push --prefix dist origin gh-pages`
+1. git checkout master # you can avoid this line if you are in master...
+2. Run `npm run build` # build production package
+3. git subtree split --prefix dist -b {version} # create a local gh-pages branch containing the splitted output folder
+4. git push -f origin {version}:gh-pages # force the push of the gh-pages branch to the remote gh-pages branch at origin
+5. git branch -D {version} # delete the local gh-pages because you will need it: ref
 
 For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
