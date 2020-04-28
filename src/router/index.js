@@ -17,6 +17,7 @@ Vue.use(Router);
 
 const router = new Router({
   mode: "history",
+  base: process.env.NODE_ENV === "production" ? "/StudentsApp/" : "/",
   routes: [
     {
       path: "*",
