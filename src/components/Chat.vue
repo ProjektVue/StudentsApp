@@ -164,9 +164,9 @@ export default {
   methods: {
     changeUser(userId) {
       this.$store.commit("setActiveChatUser", userId);
+      this.$store.dispatch("fetchConversations");
     },
     onMessageSubmit(message) {
-      console.log(this.currentConversation.id);
       fb.conversationsCollection
         .doc(this.currentConversation.id)
         .update({

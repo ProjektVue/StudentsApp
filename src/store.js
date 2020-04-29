@@ -51,7 +51,6 @@ export const store = new Vuex.Store({
           const userProfile = res.data();
           commit("setUserProfile", userProfile);
           if (userProfile.friends && userProfile.friends.length > 0) {
-            commit("setActiveChatUser", userProfile.friends[0]);
           }
         })
         .catch((err) => {
@@ -80,12 +79,15 @@ export const store = new Vuex.Store({
           );
           commit("setConversations", conversations);
           commit("setFriends", filteredFriends);
+          if (!state.activeChatUser.length) {
+            commit("setActiveChatUser", filteredFriends[0]);
+          }
           commit("setCurrentConversation", currentConversation);
         });
     },
     fetchAllUsers({ commit, state }) {
       const users = [];
-      fb.usersCollection.get().then((querySnapshot) => {
+      fb.usersCollection.onSnapshot((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           const userData = doc.data();
           users.push({
