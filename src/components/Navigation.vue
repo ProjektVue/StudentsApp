@@ -16,6 +16,9 @@
             <router-link to="users">Users</router-link>
           </li>
           <li>
+            <router-link to="chat">Chat</router-link>
+          </li>
+          <li>
             <a @click="logout">logout</a>
           </li>
         </ul>

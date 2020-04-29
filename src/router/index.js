@@ -6,6 +6,7 @@ import Login from "@/components/Login";
 import CreateEvent from "@/components/CreateEvent";
 import Dashboard from "@/components/Dashboard";
 import Users from "@/components/Users";
+import Chat from "@/components/Chat";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
@@ -51,6 +52,11 @@ const router = new Router({
       meta: {
         requiresAuth: true,
       },
+    },
+    {
+      path: "/chat",
+      name: "Chat",
+      component: Chat,
     },
   ],
 });
