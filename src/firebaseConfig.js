@@ -31,12 +31,14 @@ const postsCollection = db.collection("posts");
 const eventsCollection = db.collection("events");
 const commentsCollection = db.collection("comments");
 const likesCollection = db.collection("likes");
+const conversationsCollection = db.collection("conversations");
 
 export {
   db,
   auth,
   currentUser,
   usersCollection,
+  conversationsCollection,
   postsCollection,
   eventsCollection,
   commentsCollection,

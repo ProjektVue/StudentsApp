@@ -9,7 +9,7 @@
                 <b-col v-for="user in friends" :key="user.email">
                   <b-list-group style="max-width: 300px;">
                     <b-list-group-item
-                      :active="true"
+                      :active="activeChatUser === user.uid"
                       class="d-flex align-items-center"
                       @click="changeUser(user.uid)"
                     >
@@ -40,11 +40,7 @@
                 :display-header="true"
                 :send-images="false"
                 :profile-picture-config="profilePictureConfig"
-                @onImageClicked="onImageClicked"
-                @onImageSelected="onImageSelected"
                 @onMessageSubmit="onMessageSubmit"
-                @onType="onType"
-                @onClose="onClose"
               >
               </Chat>
             </b-col>
@@ -59,6 +55,7 @@
 import { Chat } from "vue-quick-chat";
 import "vue-quick-chat/dist/vue-quick-chat.css";
 import { mapState } from "vuex";
+const fb = require("../firebaseConfig.js");
 
 export default {
   components: {
@@ -67,73 +64,7 @@ export default {
   data() {
     return {
       visible: true,
-      participants: [
-        {
-          name: "Arnaldo",
-          id: 1,
-          profilePicture:
-            "https://upload.wikimedia.org/wikipedia/en/thumb/a/a1/NafSadh_Profile.jpg/768px-NafSadh_Profile.jpg",
-        },
-        {
-          name: "José",
-          id: 2,
-          profilePicture:
-            "https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg",
-        },
-      ],
-      myself: {
-        name: "Matheus S.",
-        id: 3,
-        profilePicture:
-          "https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg",
-      },
-      messages: [
-        {
-          content: "received messages",
-          myself: false,
-          participantId: 1,
-          timestamp: {
-            year: 2019,
-            month: 3,
-            day: 5,
-            hour: 20,
-            minute: 10,
-            second: 3,
-            millisecond: 123,
-          },
-          type: "text",
-        },
-        {
-          content: "sent messages",
-          myself: true,
-          participantId: 3,
-          timestamp: {
-            year: 2019,
-            month: 4,
-            day: 5,
-            hour: 19,
-            minute: 10,
-            second: 3,
-            millisecond: 123,
-          },
-          type: "text",
-        },
-        {
-          content: "other received messages",
-          myself: false,
-          participantId: 2,
-          timestamp: {
-            year: 2019,
-            month: 5,
-            day: 5,
-            hour: 10,
-            minute: 10,
-            second: 3,
-            millisecond: 123,
-          },
-          type: "text",
-        },
-      ],
+      messages: [],
       chatTitle: "Chat",
       placeholder: "send your message",
       colors: {
@@ -165,42 +96,7 @@ export default {
       submitIconSize: 25,
       closeButtonIconSize: "20px",
       asyncMode: false,
-      toLoad: [
-        {
-          content: "Hey, John Doe! How are you today?",
-          myself: false,
-          participantId: 2,
-          timestamp: {
-            year: 2011,
-            month: 3,
-            day: 5,
-            hour: 10,
-            minute: 10,
-            second: 3,
-            millisecond: 123,
-          },
-          uploaded: true,
-          viewed: true,
-          type: "text",
-        },
-        {
-          content: "Hey, Adam! I'm feeling really fine this evening.",
-          myself: true,
-          participantId: 3,
-          timestamp: {
-            year: 2010,
-            month: 0,
-            day: 5,
-            hour: 19,
-            minute: 10,
-            second: 3,
-            millisecond: 123,
-          },
-          uploaded: true,
-          viewed: true,
-          type: "text",
-        },
-      ],
+      toLoad: [],
       scrollBottom: {
         messageSent: true,
         messageReceived: false,
@@ -218,19 +114,42 @@ export default {
     };
   },
   computed: {
-    ...mapState(["userProfile", "currentUser", "allUsers"]),
+    ...mapState(["userProfile", "currentUser", "allUsers", "activeChatUser"]),
     friends() {
       return this.allUsers.filter((user) =>
         this.userProfile.friends.includes(user.uid)
       );
     },
+    myself() {
+      return {
+        name: this.userProfile.name,
+        id: this.userProfile.uid,
+        profilePicture: this.userProfile.avatar,
+      };
+    },
+    participants() {
+      const activeUserArr = this.allUsers.filter(
+        (user) => user.uid === this.activeChatUser
+      );
+
+      if (activeUserArr.length === 0) {
+        return [{}];
+      }
+
+      const activeUser = activeUserArr[0];
+      console.log("USER", activeUser.uid);
+      return [
+        {
+          name: activeUser.name,
+          id: activeUser.uid,
+          profilePicture: activeUser.avatar,
+        },
+      ];
+    },
   },
   methods: {
     changeUser(userId) {
-      console.log(userId);
-    },
-    onType: function(event) {
-      //here you can set any behavior
+      this.$store.commit("setActiveChatUser", userId);
     },
     loadMoreMessages(resolve) {
       setTimeout(() => {
@@ -240,49 +159,29 @@ export default {
         this.toLoad = [];
       }, 1000);
     },
-    onMessageSubmit: function(message) {
-      /*
-       * example simulating an upload callback.
-       * It's important to notice that even when your message wasn't send
-       * yet to the server you have to add the message into the array
-       */
+    onMessageSubmit(message) {
+      //   fb.messagesCollection
+      //     .doc()
+      //     .set({
+      //       createdOn: new Date(),
+      //       userId: this.currentUser.uid,
+      //       place: this.event.place,
+      //       date: this.event.date,
+      //       description: this.event.description,
+      //       time: this.event.time,
+      //       participants: 0,
+      //       createdBy: this.userProfile.name,
+      //       name: this.event.name,
+      //     })
+      //     .then((ref) => {
+      //       this.dismissCountDown = 4;
+      //       this.clearEvent();
+      //     })
+      //     .catch((err) => {
+      //       console.log(err);
+      //     });
+      console.log(message);
       this.messages.push(message);
-
-      /*
-       * you can update message state after the server response
-       */
-      // timeout simulating the request
-      setTimeout(() => {
-        message.uploaded = true;
-      }, 2000);
-    },
-    onClose() {
-      this.visible = false;
-    },
-    onImageSelected(files, message) {
-      let src =
-        "https://149364066.v2.pressablecdn.com/wp-content/uploads/2017/03/vue.jpg";
-      this.messages.push(message);
-      /**
-       * This timeout simulates a requisition that uploads the image file to the server.
-       * It's up to you implement the request and deal with the response in order to
-       * update the message status and the message URL
-       */
-      setTimeout(
-        (res) => {
-          message.uploaded = true;
-          message.src = res.src;
-        },
-        3000,
-        { src }
-      );
-    },
-    onImageClicked(message) {
-      /**
-       * This is the callback function that is going to be executed when some image is clicked.
-       * You can add your code here to do whatever you need with the image clicked. A common situation is to display the image clicked in full screen.
-       */
-      console.log("Image clicked", message.src);
     },
   },
 };

@@ -17,6 +17,7 @@ fb.auth.onAuthStateChanged((user) => {
     });
 
     store.dispatch("fetchEvents");
+    store.dispatch("fetchConversations");
   }
 });
 
@@ -28,6 +29,9 @@ export const store = new Vuex.Store({
     events: [],
     hiddenPosts: [],
     allUsers: [],
+    activeChatUser: "",
+    conversations: [],
+    friends: [],
   },
   actions: {
     clearData({ commit }) {
@@ -41,10 +45,33 @@ export const store = new Vuex.Store({
         .doc(state.currentUser.uid)
         .get()
         .then((res) => {
-          commit("setUserProfile", res.data());
+          const userProfile = res.data();
+          commit("setUserProfile", userProfile);
+          if (userProfile.friends && userProfile.friends.length > 0) {
+            commit("setActiveChatUser", userProfile.friends[0]);
+          }
         })
         .catch((err) => {
           console.log(err);
+        });
+    },
+    fetchConversations({ commit, state }) {
+      let conversations = [];
+      let friends = [];
+      fb.conversationsCollection
+        .where("participants", "array-contains", state.currentUser.uid)
+        .onSnapshot((res) => {
+          res.forEach((elem) => {
+            const data = elem.data();
+            data.id = elem.id;
+            conversations.push(data);
+            friends = [...friends, ...data.participants];
+          });
+          const filteredFriends = friends.filter(
+            (item) => item !== state.currentUser.uid
+          );
+          commit("setConversations", conversations);
+          commit("setFriends", filteredFriends);
         });
     },
     fetchAllUsers({ commit, state }) {
@@ -65,7 +92,6 @@ export const store = new Vuex.Store({
       commit("setAllUsers", users);
     },
     fetchEvents({ commit, state }) {
-      // realtime updates from our posts collection
       fb.eventsCollection.orderBy("date").onSnapshot((querySnapshot) => {
         let eventsArray = [];
         let numberOfEventsCreatedByUser = 0;
@@ -87,11 +113,20 @@ export const store = new Vuex.Store({
     setCurrentUser(state, val) {
       state.currentUser = val;
     },
+    setActiveChatUser(state, val) {
+      state.activeChatUser = val;
+    },
     setUserProfile(state, val) {
       state.userProfile = val;
     },
     setEvents(state, val) {
       state.events = val;
+    },
+    setConversations(state, val) {
+      state.conversations = val;
+    },
+    setFriends(state, val) {
+      state.friends = val;
     },
     setAllUsers(state, val) {
       if (val) {

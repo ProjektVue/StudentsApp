@@ -2,7 +2,7 @@
   <div>
     <div id="dashboard">
       <section>
-        <b-container v-if="friends.length">
+        <b-container v-if="friendsProfile.length">
           <h2 class="mt-4">Friends</h2>
           <b-row
             class="mt-4"
@@ -12,7 +12,7 @@
             cols-lg="4"
             align-v="center"
           >
-            <b-col v-for="user in friends" :key="user.email">
+            <b-col v-for="user in friendsProfile" :key="user.email">
               <b-card
                 :title="user.name"
                 :sub-title="user.email"
@@ -39,7 +39,7 @@
     <div id="dashboard">
       <section>
         <b-container v-if="otherUsers.length">
-          <div class="mt-4" v-if="!friends.length"></div>
+          <div class="mt-4" v-if="!friendsProfile.length"></div>
           <h2>Other Users</h2>
           <b-row
             class="mt-4"
@@ -89,47 +89,42 @@ export default {
     return {};
   },
   computed: {
-    ...mapState(["userProfile", "currentUser", "allUsers"]),
-    friends() {
-      return this.allUsers.filter((user) =>
-        this.userProfile.friends.includes(user.uid)
-      );
+    ...mapState([
+      "userProfile",
+      "currentUser",
+      "allUsers",
+      "conversations",
+      "friends",
+    ]),
+    friendsProfile() {
+      return this.allUsers.filter((user) => this.friends.includes(user.uid));
     },
     otherUsers() {
       return this.allUsers.filter(
         (user) =>
-          !this.userProfile.friends.includes(user.uid) &&
-          this.currentUser.uid !== user.uid
+          !this.friends.includes(user.uid) && this.currentUser.uid !== user.uid
       );
     },
   },
   methods: {
     addFriend(friendId) {
-      fb.usersCollection
-        .doc(this.currentUser.uid)
-        .update({
-          friends: [...this.userProfile.friends, friendId],
+      fb.conversationsCollection
+        .add({
+          messages: [],
+          participants: [friendId, this.currentUser.uid],
         })
-        .then(() => {
-          this.$store.dispatch("fetchUserProfile");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        .catch((e) => console.error(e));
       return;
     },
     removeFriend(friendId) {
-      const friends = this.userProfile.friends.filter(
-        (friend) => !(friend === friendId)
-      );
-      console.log(friends);
-      fb.usersCollection
-        .doc(this.currentUser.uid)
-        .update({
-          friends,
-        })
+      const conversation = this.conversations.filter((e) => {
+        return e.participants.includes(friendId);
+      });
+      fb.conversationsCollection
+        .doc(conversation[0].id)
+        .delete()
         .then(() => {
-          this.$store.dispatch("fetchUserProfile");
+          this.$store.dispatch("fetchConversations");
         })
         .catch((err) => {
           console.log(err);
