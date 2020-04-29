@@ -113,7 +113,12 @@ export default {
           messages: [],
           participants: [friendId, this.currentUser.uid],
         })
-        .catch((e) => console.error(e));
+        .then(() => {
+          this.$store.dispatch("fetchConversations");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       return;
     },
     removeFriend(friendId) {

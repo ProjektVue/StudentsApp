@@ -5,8 +5,8 @@
         <b-container>
           <b-row class="mt-4" cols="12">
             <b-col cols="6">
-              <b-container v-if="friends.length">
-                <b-col v-for="user in friends" :key="user.email">
+              <b-container v-if="friendsProfile.length">
+                <b-col v-for="user in friendsProfile" :key="user.email">
                   <b-list-group style="max-width: 300px;">
                     <b-list-group-item
                       :active="activeChatUser === user.uid"
@@ -30,11 +30,7 @@
                 :colors="colors"
                 :border-style="borderStyle"
                 :hide-close-button="true"
-                :close-button-icon-size="closeButtonIconSize"
                 :submit-icon-size="submitIconSize"
-                :load-more-messages="
-                  toLoad.length > 0 ? loadMoreMessages : null
-                "
                 :async-mode="asyncMode"
                 :scroll-bottom="scrollBottom"
                 :display-header="true"
@@ -64,7 +60,6 @@ export default {
   data() {
     return {
       visible: true,
-      messages: [],
       chatTitle: "Chat",
       placeholder: "send your message",
       colors: {
@@ -114,11 +109,31 @@ export default {
     };
   },
   computed: {
-    ...mapState(["userProfile", "currentUser", "allUsers", "activeChatUser"]),
-    friends() {
-      return this.allUsers.filter((user) =>
-        this.userProfile.friends.includes(user.uid)
-      );
+    ...mapState([
+      "userProfile",
+      "currentUser",
+      "allUsers",
+      "activeChatUser",
+      "friends",
+      "currentConversation",
+    ]),
+    friendsProfile() {
+      return this.allUsers.filter((user) => this.friends.includes(user.uid));
+    },
+    messages() {
+      const currentMessages = this.currentConversation.messages || [];
+      const transformedMessages = [];
+
+      currentMessages.forEach((message) => {
+        transformedMessages.push({
+          content: message.content,
+          myself: message.participantId === this.currentUser.uid,
+          participantId: message.participantId,
+          timestamp: JSON.parse(message.timestamp),
+          type: message.type,
+        });
+      });
+      return transformedMessages;
     },
     myself() {
       return {
@@ -137,7 +152,6 @@ export default {
       }
 
       const activeUser = activeUserArr[0];
-      console.log("USER", activeUser.uid);
       return [
         {
           name: activeUser.name,
@@ -151,37 +165,28 @@ export default {
     changeUser(userId) {
       this.$store.commit("setActiveChatUser", userId);
     },
-    loadMoreMessages(resolve) {
-      setTimeout(() => {
-        resolve(this.toLoad); //We end the loading state and add the messages
-        //Make sure the loaded messages are also added to our local messages copy or they will be lost
-        this.messages.unshift(...this.toLoad);
-        this.toLoad = [];
-      }, 1000);
-    },
     onMessageSubmit(message) {
-      //   fb.messagesCollection
-      //     .doc()
-      //     .set({
-      //       createdOn: new Date(),
-      //       userId: this.currentUser.uid,
-      //       place: this.event.place,
-      //       date: this.event.date,
-      //       description: this.event.description,
-      //       time: this.event.time,
-      //       participants: 0,
-      //       createdBy: this.userProfile.name,
-      //       name: this.event.name,
-      //     })
-      //     .then((ref) => {
-      //       this.dismissCountDown = 4;
-      //       this.clearEvent();
-      //     })
-      //     .catch((err) => {
-      //       console.log(err);
-      //     });
-      console.log(message);
-      this.messages.push(message);
+      console.log(this.currentConversation.id);
+      fb.conversationsCollection
+        .doc(this.currentConversation.id)
+        .update({
+          participants: this.currentConversation.participants,
+          messages: [
+            ...this.currentConversation.messages,
+            {
+              content: message.content,
+              participantId: this.currentUser.uid,
+              timestamp: JSON.stringify(message.timestamp),
+              type: message.type,
+            },
+          ],
+        })
+        .then((ref) => {
+          this.$store.dispatch("fetchConversations");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
 };

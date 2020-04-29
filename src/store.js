@@ -4,7 +4,6 @@ const fb = require("./firebaseConfig.js");
 
 Vue.use(Vuex);
 
-// handle page reload
 fb.auth.onAuthStateChanged((user) => {
   if (user) {
     store.commit("setCurrentUser", user);
@@ -12,7 +11,6 @@ fb.auth.onAuthStateChanged((user) => {
     store.dispatch("fetchAllUsers");
 
     fb.usersCollection.doc(user.uid).onSnapshot((doc) => {
-      console.log("user, profile", doc.data());
       store.commit("setUserProfile", doc.data());
     });
 
@@ -27,18 +25,23 @@ export const store = new Vuex.Store({
     numberOfEventsCreatedByUser: 0,
     userProfile: {},
     events: [],
-    hiddenPosts: [],
     allUsers: [],
     activeChatUser: "",
     conversations: [],
     friends: [],
+    currentConversation: {},
   },
   actions: {
     clearData({ commit }) {
       commit("setCurrentUser", null);
       commit("setUserProfile", {});
-      commit("setPosts", null);
-      commit("setHiddenPosts", null);
+      commit("setActiveChatUser", "");
+      commit("setEvents", []);
+      commit("setNumberOfEventsCreatedByUser", 0);
+      commit("setConversations", []);
+      commit("setCurrentConversation", {});
+      commit("setFriends", []);
+      commit("setAllUsers", []);
     },
     fetchUserProfile({ commit, state }) {
       fb.usersCollection
@@ -58,6 +61,7 @@ export const store = new Vuex.Store({
     fetchConversations({ commit, state }) {
       let conversations = [];
       let friends = [];
+      let currentConversation = {};
       fb.conversationsCollection
         .where("participants", "array-contains", state.currentUser.uid)
         .onSnapshot((res) => {
@@ -66,18 +70,23 @@ export const store = new Vuex.Store({
             data.id = elem.id;
             conversations.push(data);
             friends = [...friends, ...data.participants];
+
+            if (data.participants.includes(state.activeChatUser)) {
+              currentConversation = data;
+            }
           });
           const filteredFriends = friends.filter(
             (item) => item !== state.currentUser.uid
           );
           commit("setConversations", conversations);
           commit("setFriends", filteredFriends);
+          commit("setCurrentConversation", currentConversation);
         });
     },
     fetchAllUsers({ commit, state }) {
       const users = [];
-      fb.usersCollection.get().then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
+      fb.usersCollection.get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
           const userData = doc.data();
           users.push({
             uid: doc.id,
@@ -127,6 +136,9 @@ export const store = new Vuex.Store({
     },
     setFriends(state, val) {
       state.friends = val;
+    },
+    setCurrentConversation(state, val) {
+      state.currentConversation = val;
     },
     setAllUsers(state, val) {
       if (val) {
