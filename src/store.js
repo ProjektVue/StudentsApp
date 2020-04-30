@@ -79,7 +79,10 @@ export const store = new Vuex.Store({
           );
           commit("setConversations", conversations);
           commit("setFriends", filteredFriends);
-          if (!state.activeChatUser.length) {
+          if (
+            (state.activeChatUser && !state.activeChatUser.length) ||
+            !state.setActiveChatUser
+          ) {
             commit("setActiveChatUser", filteredFriends[0]);
           }
           commit("setCurrentConversation", currentConversation);

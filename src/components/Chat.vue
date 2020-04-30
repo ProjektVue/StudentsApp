@@ -2,10 +2,10 @@
   <div>
     <div id="dashboard">
       <section>
-        <b-container>
+        <b-container v-if="friendsProfile.length">
           <b-row class="mt-4" cols="12">
             <b-col cols="6">
-              <b-container v-if="friendsProfile.length">
+              <b-container>
                 <b-col v-for="user in friendsProfile" :key="user.email">
                   <b-list-group style="max-width: 300px;">
                     <b-list-group-item
@@ -41,6 +41,9 @@
               </Chat>
             </b-col>
           </b-row>
+        </b-container>
+        <b-container v-else class="mt-4">
+          Add new friend to begin chat
         </b-container>
       </section>
     </div>
@@ -94,7 +97,7 @@ export default {
       toLoad: [],
       scrollBottom: {
         messageSent: true,
-        messageReceived: false,
+        messageReceived: true,
       },
       displayHeader: true,
       profilePictureConfig: {
