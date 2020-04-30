@@ -95,6 +95,7 @@ export default {
       "allUsers",
       "conversations",
       "friends",
+      "activeChatUser",
     ]),
     friendsProfile() {
       return this.allUsers.filter((user) => this.friends.includes(user.uid));
@@ -125,6 +126,9 @@ export default {
       const conversation = this.conversations.filter((e) => {
         return e.participants.includes(friendId);
       });
+      if (friendId === this.activeChatUser) {
+        this.$store.commit("setActiveChatUser", "");
+      }
       fb.conversationsCollection
         .doc(conversation[0].id)
         .delete()

@@ -94,7 +94,7 @@ export default {
       toLoad: [],
       scrollBottom: {
         messageSent: true,
-        messageReceived: false,
+        messageReceived: true,
       },
       displayHeader: true,
       profilePictureConfig: {
