@@ -30,12 +30,8 @@
                         <br />
                         {{ userProfile.city + ", " + userProfile.country }}
                         <br />
-                        {{ userProfile.friends.length }}
-                        {{
-                          userProfile.friends.length === 1
-                            ? "friend"
-                            : "friends"
-                        }}
+                        {{ friends.length }}
+                        {{ friends.length === 1 ? "friend" : "friends" }}
                         <br />
                         {{ numberOfEventsCreatedByUser }}
                         {{
@@ -96,6 +92,7 @@ export default {
       "allUsers",
       "events",
       "numberOfEventsCreatedByUser",
+      "friends",
     ]),
   },
   methods: {},
