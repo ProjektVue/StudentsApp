@@ -57,6 +57,9 @@ const router = new Router({
       path: "/chat",
       name: "Chat",
       component: Chat,
+      meta: {
+        requiresAuth: true,
+      }
     },
   ],
 });
