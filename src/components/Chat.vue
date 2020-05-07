@@ -170,26 +170,28 @@ export default {
       this.$store.dispatch("fetchConversations");
     },
     onMessageSubmit(message) {
-      fb.conversationsCollection
-        .doc(this.currentConversation.id)
-        .update({
-          participants: this.currentConversation.participants,
-          messages: [
-            ...this.currentConversation.messages,
-            {
-              content: message.content,
-              participantId: this.currentUser.uid,
-              timestamp: JSON.stringify(message.timestamp),
-              type: message.type,
-            },
-          ],
-        })
-        .then((ref) => {
-          this.$store.dispatch("fetchConversations");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      if (this.currentConversation.id) {
+        fb.conversationsCollection
+          .doc(this.currentConversation.id)
+          .update({
+            participants: this.currentConversation.participants,
+            messages: [
+              ...this.currentConversation.messages,
+              {
+                content: message.content,
+                participantId: this.currentUser.uid,
+                timestamp: JSON.stringify(message.timestamp),
+                type: message.type
+              }
+            ]
+          })
+          .then(ref => {
+            this.$store.dispatch("fetchConversations");
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
     },
   },
 };
